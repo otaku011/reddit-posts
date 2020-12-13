@@ -18,8 +18,8 @@ logging.basicConfig(
 logging.getLogger().addHandler(logging.StreamHandler())
 
 reddit = praw.Reddit(
-    client_id="",
-    client_secret="",
+    client_id="id",
+    client_secret="secret",
     user_agent="Discord bot (for /r/animepiracy)"
 )
 
@@ -45,7 +45,7 @@ async def check_for_posts():
 
                 embed = discord.Embed(
                     title="r/" + subreddit + " - " + submission.title,
-                    url=submission.url,
+                    url=f"https://reddit.com{submission.permalink}",
                     description=submission.selftext[0:350],
                 )
 
@@ -59,7 +59,11 @@ async def check_for_posts():
                 if len(submission.selftext) > 350:
                     embed.description = embed.description + "..."
 
-                channel = bot.get_channel(0000000000000000)
+                channel = bot.get_channel(000000000000000000)
+                if not channel:
+                    logging.info(f"Unable to find channel to post: {submission.title} by /u/{submission.author.name}")
+                    continue
+
                 await channel.send(embed=embed)
                 cache.append(submission.id)
 
@@ -73,4 +77,4 @@ async def check_for_posts():
 
 
 bot.loop.create_task(check_for_posts())
-bot.run("")
+bot.run("token")
