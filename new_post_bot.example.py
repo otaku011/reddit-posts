@@ -44,8 +44,8 @@ async def check_for_posts():
                 logging.info(f"{submission.title} was posted by /u/{submission.author.name}")
 
                 embed = discord.Embed(
-                    title="r/" + subreddit + " - " + submission.title,
-                    url=submission.url,
+                    title="r/" + subreddit + " - " + submission.title[0:253],
+                    url=f"https://reddit.com{submission.permalink}",
                     description=submission.selftext[0:350],
                 )
 
@@ -59,7 +59,14 @@ async def check_for_posts():
                 if len(submission.selftext) > 350:
                     embed.description = embed.description + "..."
 
+                if len(submission.title) > 253:
+                    embed.title = embed.title + "..."
+
                 channel = bot.get_channel(0000000000000000)
+                if not channel:
+                    logging.info(f"Unable to find channel to post: {submission.title} by /u/{submission.author.name}")
+                    continue
+
                 await channel.send(embed=embed)
                 cache.append(submission.id)
 
